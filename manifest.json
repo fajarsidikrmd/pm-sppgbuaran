@@ -1,8 +1,9 @@
 {
-  "name": "sppgbuaran. - Portal Data PM",
+  "name": "SPPGBuaran - Portal Data Penerima Manfaat",
   "short_name": "SPPG Buaran",
   "description": "Portal Data Penerima Manfaat SPPG Buaran",
-  "start_url": "./",
+  "start_url": "/pm-sppgbuaran/",
+  "scope": "/pm-sppgbuaran/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F4F6F8",
