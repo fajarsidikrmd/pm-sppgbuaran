@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SPPGBuaran - Portal Data Penerima Manfaat</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#16587B">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/flatware/default/512px.png">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: #F4F6F8;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GANTI DENGAN URL WEB APP APPS SCRIPT ANDA (/exec) -->
+  <iframe src="https://script.google.com/macros/s/AKfycbzl73Ue9hVuI7CMt_xLLNyzDOjNNOgRseqxhrx4UyHcACus7I3Pw2kcYBLI0NRkWXcR1g/exec" allow="geolocation; camera"></iframe>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('PWA Service Worker terdaftar:', reg.scope))
+          .catch((err) => console.error('PWA SW Error:', err));
+      });
+    }
+  </script>
+</body>
+</html>
