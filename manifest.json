@@ -1,5 +1,6 @@
 {
-  "name": "SPPGBuaran - Portal Data Penerima Manfaat",
+  "id": "/pm-sppgbuaran/",
+  "name": "SPPGBuaran - Portal Data PM",
   "short_name": "SPPG Buaran",
   "description": "Portal Data Penerima Manfaat SPPG Buaran",
   "start_url": "/pm-sppgbuaran/",
@@ -9,6 +10,12 @@
   "background_color": "#F4F6F8",
   "theme_color": "#16587B",
   "icons": [
+    {
+      "src": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/flatware/default/192px.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
     {
       "src": "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/flatware/default/512px.png",
       "sizes": "512x512",
