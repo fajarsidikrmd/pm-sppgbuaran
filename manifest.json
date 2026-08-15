@@ -1,6 +1,6 @@
 {
   "id": "/pm-sppgbuaran/",
-  "name": "SPPG Buaran - PDPM",
+  "name": "SPPG Buaran App",
   "short_name": "SPPG Buaran",
   "description": "Portal Data Penerima Manfaat SPPG Buaran",
   "start_url": "/pm-sppgbuaran/",
@@ -11,15 +11,15 @@
   "theme_color": "#16587B",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%2316587B'/><path fill='%23ffffff' d='M60 44v36c0 13.255 10.745 24 24 24v44h16v-44c13.255 0 24-10.745 24-24V44h-12v36a12 12 0 0 1-24 0V44H76v36a12 12 0 0 1-24 0V44H60z'/></svg>",
+      "src": "/pm-sppgbuaran/icon-512.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='110' fill='%2316587B'/><path fill='%23ffffff' d='M160 117v96c0 35.346 28.654 64 64 64v118h44V277c35.346 0 64-28.654 64-64v-96h-32v96a32 32 0 0 1-64 0v-96h-22v96a32 32 0 0 1-64 0v-96h-32z'/></svg>",
+      "src": "/pm-sppgbuaran/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
