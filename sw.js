@@ -8,10 +8,12 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', function(event) {
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
+    caches.match(event.request).then(function(response) {
+      return response || fetch(event.request);
+    }).catch(function() {
+      return fetch(event.request);
     })
   );
 });
