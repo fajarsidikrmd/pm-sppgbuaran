@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sppg-buaran-v1';
+const CACHE_NAME = 'sppg-buaran-v4.6';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
