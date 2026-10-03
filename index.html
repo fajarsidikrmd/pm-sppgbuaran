@@ -29,7 +29,7 @@
     }
   </style>
 
-  <!-- SDK OneSignal di Halaman Induk GitHub Pages -->
+  <!-- PUSTAKA ONESIGNAL RESMI PADA DOMAIN INDUK (GITHUB PAGES) -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -41,30 +41,38 @@
         notifyButton: { enable: false },
         allowLocalhostAsSecureOrigin: true
       });
+      console.log("[OneSignal] Inisialisasi berhasil di domain GitHub Pages.");
     });
 
-    // Menangkap sinyal klik tombol dari iframe Google Apps Script
+    // MENANGKAP SINYAL KLIK TOMBOL DARI DALAM IFRAME GOOGLE APPS SCRIPT
     window.addEventListener("message", async function(event) {
       if (event.data && event.data.action === "ACTIVATE_ADMIN_PUSH") {
+        console.log("[OneSignal] Sinyal aktivasi diterima dari iframe.");
+
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
         OneSignalDeferred.push(async function(OneSignal) {
           try {
-            // Minta izin langsung di level domain GitHub Pages
-            await OneSignal.Notifications.requestPermission();
-            
+            // Minta izin jika belum aktif
+            if (Notification.permission !== "granted") {
+              await OneSignal.Notifications.requestPermission();
+            }
+
+            // Daftarkan langganan push perangkat
             if (OneSignal.User && OneSignal.User.PushSubscription) {
               await OneSignal.User.PushSubscription.optIn();
             }
 
-            // Pasang tanda/tag admin
+            // Pasang label/tag admin ke perangkat
             await OneSignal.User.addTag("role", "admin");
+            console.log("[OneSignal] Perangkat resmi terdaftar dengan tag role=admin.");
 
-            // Beri tahu iframe bahwa pendaftaran berhasil
+            // Kirim konfirmasi balik ke dalam iframe
             const iframe = document.getElementById("gasIframe");
             if (iframe && iframe.contentWindow) {
               iframe.contentWindow.postMessage({ action: "ADMIN_PUSH_SUCCESS" }, "*");
             }
           } catch (err) {
-            console.error("Gagal aktivasi OneSignal di GitHub Pages:", err);
+            console.error("[OneSignal] Gagal mendaftarkan push:", err);
           }
         });
       }
@@ -73,7 +81,7 @@
 </head>
 <body>
 
-  <!-- Iframe Google Apps Script dengan ID gasIframe -->
+  <!-- Iframe Google Apps Script dengan atribut ID gasIframe -->
   <iframe 
     id="gasIframe"
     src="https://script.google.com/macros/s/AKfycbzyvqiKvx51DhSNcnUHxR1l4YEjdVy1ONu6m86W-5Dv_VtidRf5Hg2PFUxUxHwUqeJkJw/exec" 
