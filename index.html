@@ -29,7 +29,7 @@
     }
   </style>
 
-  <!-- ONESIGNAL SDK HOSTING GITHUB PAGES -->
+  <!-- ONESIGNAL SDK GITHUB PAGES -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -41,29 +41,64 @@
         serviceWorkerParam: { scope: "/pm-sppgbuaran/" },
         allowLocalhostAsSecureOrigin: true
       });
+
+      // Otomatis pasang tag admin jika izin notifikasi peramban sudah aktif
+      if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.optedIn) {
+        await OneSignal.User.addTag("role", "admin");
+        console.log("[OneSignal] Default tag role=admin otomatis terpasang.");
+      }
     });
 
-    // Jembatan penerima sinyal tombol dari Google Apps Script
+    // Menangkap sinyal langsung dari iframe Google Apps Script via window.top
     window.addEventListener("message", async function(event) {
       if (!event.data) return;
 
+      // 1. Aktivasi tombol profil admin
       if (event.data.action === "ACTIVATE_ADMIN_PUSH") {
         window.OneSignalDeferred = window.OneSignalDeferred || [];
         OneSignalDeferred.push(async function(OneSignal) {
           try {
-            await OneSignal.Notifications.requestPermission();
+            if (Notification.permission !== "granted") {
+              await OneSignal.Notifications.requestPermission();
+            }
             if (OneSignal.User && OneSignal.User.PushSubscription) {
               await OneSignal.User.PushSubscription.optIn();
             }
-            // Pasang tag admin ke profil perangkat
             await OneSignal.User.addTag("role", "admin");
-
-            const iframe = document.getElementById("gasIframe");
-            if (iframe && iframe.contentWindow) {
-              iframe.contentWindow.postMessage({ action: "ADMIN_PUSH_SUCCESS" }, "*");
-            }
+            console.log("[OneSignal] Tombol profil: Tag role=admin berhasil dipasang!");
           } catch (e) {
             console.error("[OneSignal Error]:", e);
+          }
+        });
+      }
+
+      // 2. Sinkronisasi multi-tag saat login
+      if (event.data.action === "SYNC_USER_TAGS") {
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+          try {
+            if (event.data.email) {
+              await OneSignal.login(event.data.email);
+            }
+            if (event.data.tags) {
+              await OneSignal.User.addTags(event.data.tags);
+            }
+            console.log("[OneSignal] Multi-tag berhasil disinkronkan:", event.data.tags);
+          } catch (e) {
+            console.error("[OneSignal Error Sync]:", e);
+          }
+        });
+      }
+
+      // 3. Pembersihan tag saat logout
+      if (event.data.action === "CLEAR_USER_TAGS") {
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+          try {
+            await OneSignal.logout();
+            console.log("[OneSignal] Tag akun dibersihkan.");
+          } catch (e) {
+            console.error("[OneSignal Error Logout]:", e);
           }
         });
       }
