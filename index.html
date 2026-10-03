@@ -28,19 +28,57 @@
       display: block;
     }
   </style>
+
+  <!-- SDK OneSignal di Halaman Induk GitHub Pages -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "45e3fd0d-04ff-4415-a898-b47b301ee157",
+        serviceWorkerParam: { scope: "/pm-sppgbuaran/" },
+        serviceWorkerPath: "/pm-sppgbuaran/sw.js",
+        notifyButton: { enable: false },
+        allowLocalhostAsSecureOrigin: true
+      });
+    });
+
+    // Menangkap sinyal klik tombol dari iframe Google Apps Script
+    window.addEventListener("message", async function(event) {
+      if (event.data && event.data.action === "ACTIVATE_ADMIN_PUSH") {
+        OneSignalDeferred.push(async function(OneSignal) {
+          try {
+            // Minta izin langsung di level domain GitHub Pages
+            await OneSignal.Notifications.requestPermission();
+            
+            if (OneSignal.User && OneSignal.User.PushSubscription) {
+              await OneSignal.User.PushSubscription.optIn();
+            }
+
+            // Pasang tanda/tag admin
+            await OneSignal.User.addTag("role", "admin");
+
+            // Beri tahu iframe bahwa pendaftaran berhasil
+            const iframe = document.getElementById("gasIframe");
+            if (iframe && iframe.contentWindow) {
+              iframe.contentWindow.postMessage({ action: "ADMIN_PUSH_SUCCESS" }, "*");
+            }
+          } catch (err) {
+            console.error("Gagal aktivasi OneSignal di GitHub Pages:", err);
+          }
+        });
+      }
+    });
+  </script>
 </head>
 <body>
 
-  <iframe src="https://script.google.com/macros/s/AKfycbzyvqiKvx51DhSNcnUHxR1l4YEjdVy1ONu6m86W-5Dv_VtidRf5Hg2PFUxUxHwUqeJkJw/exec" allow="geolocation; camera"></iframe>
+  <!-- Iframe Google Apps Script dengan ID gasIframe -->
+  <iframe 
+    id="gasIframe"
+    src="https://script.google.com/macros/s/AKfycbzyvqiKvx51DhSNcnUHxR1l4YEjdVy1ONu6m86W-5Dv_VtidRf5Hg2PFUxUxHwUqeJkJw/exec" 
+    allow="geolocation; camera">
+  </iframe>
 
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/pm-sppgbuaran/sw.js', { scope: '/pm-sppgbuaran/' })
-          .then((reg) => console.log('SW terdaftar:', reg.scope))
-          .catch((err) => console.error('SW Error:', err));
-      });
-    }
-  </script>
 </body>
 </html>
