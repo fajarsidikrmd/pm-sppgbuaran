@@ -43,56 +43,27 @@
       });
     });
 
-    // Jembatan komunikasi data akun dari dalam iframe Google Apps Script
+    // Jembatan penerima sinyal tombol dari Google Apps Script
     window.addEventListener("message", async function(event) {
       if (!event.data) return;
 
-      // Skenario A: Sinkronisasi Identitas saat Pengguna Login (Real-Time Role Switch)
-      if (event.data.action === "SYNC_USER_TAGS" && event.data.email) {
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        OneSignalDeferred.push(async function(OneSignal) {
-          try {
-            await OneSignal.login(event.data.email);
-            if (event.data.tags) {
-              await OneSignal.User.addTags(event.data.tags);
-            }
-            console.log("[OneSignal] Identitas berganti ke:", event.data.email, event.data.tags);
-          } catch (e) {
-            console.error("[OneSignal Error Login]:", e);
-          }
-        });
-      }
-
-      // Skenario B: Pembersihan Identitas saat Pengguna Logout
-      if (event.data.action === "CLEAR_USER_TAGS") {
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        OneSignalDeferred.push(async function(OneSignal) {
-          try {
-            await OneSignal.logout();
-            console.log("[OneSignal] Pengguna logout, perangkat netral.");
-          } catch (e) {
-            console.error("[OneSignal Error Logout]:", e);
-          }
-        });
-      }
-
-      // Skenario C: Pemicu Izin Notifikasi dari Tombol Menu Profil
       if (event.data.action === "ACTIVATE_ADMIN_PUSH") {
         window.OneSignalDeferred = window.OneSignalDeferred || [];
         OneSignalDeferred.push(async function(OneSignal) {
           try {
-            if (Notification.permission !== "granted") {
-              await OneSignal.Notifications.requestPermission();
-            }
+            await OneSignal.Notifications.requestPermission();
             if (OneSignal.User && OneSignal.User.PushSubscription) {
               await OneSignal.User.PushSubscription.optIn();
             }
+            // Pasang tag admin ke profil perangkat
+            await OneSignal.User.addTag("role", "admin");
+
             const iframe = document.getElementById("gasIframe");
             if (iframe && iframe.contentWindow) {
               iframe.contentWindow.postMessage({ action: "ADMIN_PUSH_SUCCESS" }, "*");
             }
           } catch (e) {
-            console.error("[OneSignal Error Permission]:", e);
+            console.error("[OneSignal Error]:", e);
           }
         });
       }
