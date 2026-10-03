@@ -30,6 +30,7 @@
   </style>
 
   <!-- PUSTAKA ONESIGNAL RESMI PADA DOMAIN INDUK (GITHUB PAGES) -->
+  <!-- SDK OneSignal di Halaman Induk GitHub Pages -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -41,38 +42,54 @@
         notifyButton: { enable: false },
         allowLocalhostAsSecureOrigin: true
       });
-      console.log("[OneSignal] Inisialisasi berhasil di domain GitHub Pages.");
+
+      // Fungsi pasang tag role=admin otomatis
+      async function applyAdminTag() {
+        try {
+          if (OneSignal.User) {
+            await OneSignal.User.addTag("role", "admin");
+            console.log("[OneSignal] Tag role=admin berhasil dipasang otomatis.");
+          }
+        } catch (e) {
+          console.error("[OneSignal] Gagal memasang tag:", e);
+        }
+      }
+
+      // Pasang tag jika langganan sudah aktif
+      if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.optedIn) {
+        await applyAdminTag();
+      }
+
+      // Pantau jika status izin berubah menjadi aktif
+      if (OneSignal.User && OneSignal.User.PushSubscription) {
+        OneSignal.User.PushSubscription.addEventListener("change", async function(event) {
+          if (event.current.optedIn) {
+            await applyAdminTag();
+          }
+        });
+      }
     });
 
-    // MENANGKAP SINYAL KLIK TOMBOL DARI DALAM IFRAME GOOGLE APPS SCRIPT
+    // Menangkap sinyal tombol profil
     window.addEventListener("message", async function(event) {
       if (event.data && event.data.action === "ACTIVATE_ADMIN_PUSH") {
-        console.log("[OneSignal] Sinyal aktivasi diterima dari iframe.");
-
         window.OneSignalDeferred = window.OneSignalDeferred || [];
         OneSignalDeferred.push(async function(OneSignal) {
           try {
-            // Minta izin jika belum aktif
             if (Notification.permission !== "granted") {
               await OneSignal.Notifications.requestPermission();
             }
-
-            // Daftarkan langganan push perangkat
             if (OneSignal.User && OneSignal.User.PushSubscription) {
               await OneSignal.User.PushSubscription.optIn();
             }
-
-            // Pasang label/tag admin ke perangkat
             await OneSignal.User.addTag("role", "admin");
-            console.log("[OneSignal] Perangkat resmi terdaftar dengan tag role=admin.");
 
-            // Kirim konfirmasi balik ke dalam iframe
             const iframe = document.getElementById("gasIframe");
             if (iframe && iframe.contentWindow) {
               iframe.contentWindow.postMessage({ action: "ADMIN_PUSH_SUCCESS" }, "*");
             }
           } catch (err) {
-            console.error("[OneSignal] Gagal mendaftarkan push:", err);
+            console.error("Error aktivasi OneSignal:", err);
           }
         });
       }
