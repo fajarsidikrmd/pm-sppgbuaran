@@ -29,40 +29,45 @@
     }
   </style>
 
-  <!-- SDK ONESIGNAL -->
+  <!-- SDK ONESIGNAL DENGAN RUTE SUBFOLDER GITHUB PAGES -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.init({
         appId: "45e3fd0d-04ff-4415-a898-b47b301ee157",
+        path: "/pm-sppgbuaran/",
+        serviceWorkerPath: "OneSignalSDKWorker.js",
         serviceWorkerParam: { scope: "/pm-sppgbuaran/" },
-        serviceWorkerPath: "/pm-sppgbuaran/OneSignalSDKWorker.js",
         allowLocalhostAsSecureOrigin: true
       });
 
-      // Otomatis tandai perangkat sebagai role=admin jika izin aktif
-      async function syncRoleAdmin() {
-        if (OneSignal.User) {
-          await OneSignal.User.addTag("role", "admin");
-          console.log("[OneSignal] Perangkat berhasil ditandai role=admin");
+      // Pemasangan tanda role=admin otomatis
+      async function syncAdminTag() {
+        try {
+          if (OneSignal.User) {
+            await OneSignal.User.addTag("role", "admin");
+            console.log("[OneSignal] Tag role=admin berhasil terpasang.");
+          }
+        } catch (e) {
+          console.error("[OneSignal] Gagal pasang tag:", e);
         }
       }
 
       if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.optedIn) {
-        await syncRoleAdmin();
+        await syncAdminTag();
       }
 
       if (OneSignal.User && OneSignal.User.PushSubscription) {
         OneSignal.User.PushSubscription.addEventListener("change", async function(event) {
           if (event.current.optedIn) {
-            await syncRoleAdmin();
+            await syncAdminTag();
           }
         });
       }
     });
 
-    // Jembatan penerima sinyal tombol dari Google Apps Script
+    // Menghubungkan klik tombol profil di dalam iframe
     window.addEventListener("message", async function(event) {
       if (event.data && event.data.action === "ACTIVATE_ADMIN_PUSH") {
         window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -78,8 +83,8 @@
             if (iframe && iframe.contentWindow) {
               iframe.contentWindow.postMessage({ action: "ADMIN_PUSH_SUCCESS" }, "*");
             }
-          } catch (e) {
-            console.error("[OneSignal Error]:", e);
+          } catch (err) {
+            console.error("[OneSignal Error]:", err);
           }
         });
       }
