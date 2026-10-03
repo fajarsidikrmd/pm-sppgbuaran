@@ -29,8 +29,7 @@
     }
   </style>
 
-  <!-- PUSTAKA ONESIGNAL RESMI PADA DOMAIN INDUK (GITHUB PAGES) -->
-  <!-- SDK OneSignal di Halaman Induk GitHub Pages -->
+  <!-- SDK ONESIGNAL -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -38,47 +37,38 @@
       await OneSignal.init({
         appId: "45e3fd0d-04ff-4415-a898-b47b301ee157",
         serviceWorkerParam: { scope: "/pm-sppgbuaran/" },
-        serviceWorkerPath: "/pm-sppgbuaran/sw.js",
-        notifyButton: { enable: false },
+        serviceWorkerPath: "/pm-sppgbuaran/OneSignalSDKWorker.js",
         allowLocalhostAsSecureOrigin: true
       });
 
-      // Fungsi pasang tag role=admin otomatis
-      async function applyAdminTag() {
-        try {
-          if (OneSignal.User) {
-            await OneSignal.User.addTag("role", "admin");
-            console.log("[OneSignal] Tag role=admin berhasil dipasang otomatis.");
-          }
-        } catch (e) {
-          console.error("[OneSignal] Gagal memasang tag:", e);
+      // Otomatis tandai perangkat sebagai role=admin jika izin aktif
+      async function syncRoleAdmin() {
+        if (OneSignal.User) {
+          await OneSignal.User.addTag("role", "admin");
+          console.log("[OneSignal] Perangkat berhasil ditandai role=admin");
         }
       }
 
-      // Pasang tag jika langganan sudah aktif
       if (OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.optedIn) {
-        await applyAdminTag();
+        await syncRoleAdmin();
       }
 
-      // Pantau jika status izin berubah menjadi aktif
       if (OneSignal.User && OneSignal.User.PushSubscription) {
         OneSignal.User.PushSubscription.addEventListener("change", async function(event) {
           if (event.current.optedIn) {
-            await applyAdminTag();
+            await syncRoleAdmin();
           }
         });
       }
     });
 
-    // Menangkap sinyal tombol profil
+    // Jembatan penerima sinyal tombol dari Google Apps Script
     window.addEventListener("message", async function(event) {
       if (event.data && event.data.action === "ACTIVATE_ADMIN_PUSH") {
         window.OneSignalDeferred = window.OneSignalDeferred || [];
         OneSignalDeferred.push(async function(OneSignal) {
           try {
-            if (Notification.permission !== "granted") {
-              await OneSignal.Notifications.requestPermission();
-            }
+            await OneSignal.Notifications.requestPermission();
             if (OneSignal.User && OneSignal.User.PushSubscription) {
               await OneSignal.User.PushSubscription.optIn();
             }
@@ -88,8 +78,8 @@
             if (iframe && iframe.contentWindow) {
               iframe.contentWindow.postMessage({ action: "ADMIN_PUSH_SUCCESS" }, "*");
             }
-          } catch (err) {
-            console.error("Error aktivasi OneSignal:", err);
+          } catch (e) {
+            console.error("[OneSignal Error]:", e);
           }
         });
       }
@@ -98,7 +88,6 @@
 </head>
 <body>
 
-  <!-- Iframe Google Apps Script dengan atribut ID gasIframe -->
   <iframe 
     id="gasIframe"
     src="https://script.google.com/macros/s/AKfycbzyvqiKvx51DhSNcnUHxR1l4YEjdVy1ONu6m86W-5Dv_VtidRf5Hg2PFUxUxHwUqeJkJw/exec" 
