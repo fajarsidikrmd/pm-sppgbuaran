@@ -1,26 +1,25 @@
 {
-  "id": "/pm-sppgbuaran/",
   "name": "SPPG Buaran",
   "short_name": "SPPG Buaran",
-  "description": "Portal Data Penerima Manfaat SPPG Buaran",
-  "start_url": "/pm-sppgbuaran/",
-  "scope": "/pm-sppgbuaran/",
+  "id": "/pm-sppgbuaran/?v=2",
+  "start_url": "./?v=2",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#FFFFFF",
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "./icon-launcher.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "./icon-splash.png",
+      "src": "./icon-splash.png?v=2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "./icon-launcher.png?v=2",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
