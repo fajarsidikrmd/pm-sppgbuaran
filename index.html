@@ -7,19 +7,23 @@
   
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./icon-512-v2.png">
-  <meta name="theme-color" content="#FFFFFF">
+  
+  <!-- 1. LATAR ATAS BROWSER / STATUS BAR HITAM -->
+  <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <!-- 2. STATUS BAR IPHONE TEKS PUTIH DI ATAS LATAR HITAM -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* 3. LATAR DASAR & SAFE-AREA ATAS/BAWAH HITAM */
     html, body {
       width: 100%;
       height: 100%;
       height: 100dvh;
       overflow: hidden;
-      background-color: #F4F6F8;
+      background-color: #000000;
     }
     iframe {
       width: 100%;
